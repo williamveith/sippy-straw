@@ -1,0 +1,47 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ssl:/etc/ssl
+      - ./html:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - webnet
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"          
+          memory: 20M
+        reservations:
+          cpus: "0.25"
+          memory: 10M
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    volumes:
+      - ./cloudflared:/etc/cloudflared
+    command: tunnel --no-autoupdate run tiecloud
+    env_file:
+      - .env
+    networks:
+      - webnet
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "5.0"          
+          memory: 30M
+        reservations:
+          cpus: "2.50"
+          memory: 15M
+
+
+networks:
+  webnet:
+    driver: bridge
