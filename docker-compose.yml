@@ -10,7 +10,7 @@ services:
       - "80:80"
       - "443:443"
     networks:
-      - webnet
+      - piping
     restart: on-failure
     deploy:
       resources:
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
     networks:
-      - webnet
+      - piping
     restart: on-failure
     deploy:
       resources:
@@ -43,5 +43,5 @@ services:
 
 
 networks:
-  webnet:
+  piping:
     driver: bridge
