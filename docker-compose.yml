@@ -3,7 +3,7 @@ services:
     image: nginx:mainline-alpine3.20-slim
     container_name: nginx
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx:/etc/nginx/conf.d
       - ./ssl:/etc/ssl
       - ./html:/usr/share/nginx/html
     ports:
@@ -22,7 +22,7 @@ services:
           memory: 10M
 
   cloudflared:
-    image: cloudflare/cloudflared:2024.8.2
+    image: overtime0022/cloudflared:2024.8.2
     container_name: cloudflared
     volumes:
       - ./cloudflared:/etc/cloudflared

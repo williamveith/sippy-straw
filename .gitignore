@@ -2,3 +2,4 @@ ssl/*
 cloudflared/*
 .env
 .DS_Store
+venv
