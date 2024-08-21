@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:mainline-alpine3.20-slim
     container_name: nginx
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
@@ -22,7 +22,7 @@ services:
           memory: 10M
 
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2024.8.2
     container_name: cloudflared
     volumes:
       - ./cloudflared:/etc/cloudflared
