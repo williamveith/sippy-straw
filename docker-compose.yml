@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: nginx:mainline-alpine3.20-slim
+    image: nginx:mainline-alpine
     container_name: nginx
     volumes:
       - ./nginx:/etc/nginx/conf.d
@@ -11,6 +11,7 @@ services:
       - "443:443"
     networks:
       - piping
+      - external_app_net
     restart: on-failure
     deploy:
       resources:
@@ -41,7 +42,32 @@ services:
           cpus: "2.50"
           memory: 15M
 
+  certbot:
+    build:
+      context: .
+      dockerfile: Dockerfile.certbot
+    container_name: certbot
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - letsencrypt_lib:/var/lib/letsencrypt
+      - cloudflared:/cloudflared
+    networks:
+      - piping
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: "20M"
+        reservations:
+          memory: "10M"
 
 networks:
   piping:
     driver: bridge
+  external_app_net:
+    external: true
+
+volumes:
+  letsencrypt:
+  letsencrypt_lib:
+  cloudflared:
