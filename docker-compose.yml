@@ -5,7 +5,6 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./ssl:/etc/ssl
-      - ./html:/usr/share/nginx/html
     ports:
       - "80:80"
       - "443:443"
@@ -16,11 +15,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.50"          
-          memory: 20M
+          cpus: "2"          
+          memory: 800M
         reservations:
           cpus: "0.25"
-          memory: 10M
+          memory: 100M
 
   cloudflared:
     image: overtime0022/cloudflared:2024.8.2
@@ -36,10 +35,9 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "5.0"          
-          memory: 30M
+          memory: 800M
         reservations:
-          cpus: "2.50"
+          cpus: "0.25"
           memory: 15M
 
   certbot:
@@ -57,9 +55,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: "20M"
+          memory: 20M
         reservations:
-          memory: "10M"
+          memory: 10M
 
 networks:
   piping:
