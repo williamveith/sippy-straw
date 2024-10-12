@@ -1,0 +1,30 @@
+# Define the Alpine version with a specific digest
+ARG ALPINE_VERSION="latest"
+FROM --platform=$BUILDPLATFORM alpine:$ALPINE_VERSION AS builder
+
+# Use Docker's BUILDARCH variable to set the architecture
+ARG BUILDARCH
+
+# Version of Cloudflared to install
+ARG CLOUDFLARED_VERSION
+ENV CLOUDFLARED_VERSION=$CLOUDFLARED_VERSION
+
+# Install necessary dependencies (caches unless Alpine version changes)
+RUN apk add --update --no-cache wget binutils
+
+# Download and strip the cloudflared binary (caches unless CLOUDFLARED_VERSION and/or BUILDARCH changes)
+RUN wget -q https://github.com/cloudflare/cloudflared/releases/download/$CLOUDFLARED_VERSION/cloudflared-linux-$BUILDARCH -O /usr/local/bin/cloudflared && \
+    strip --strip-unneeded /usr/local/bin/cloudflared
+
+# Change ownership of the cloudflared binary to the non-root user
+RUN addgroup -S cloudflare && adduser -S -G cloudflare cloudflare && \
+    chown cloudflare:cloudflare /usr/local/bin/cloudflared && \
+    chmod +x /usr/local/bin/cloudflared && \
+    apk del wget binutils
+
+# Minimal setup with scratch as base
+FROM scratch
+COPY --from=builder /usr/local/bin/cloudflared /usr/local/bin/cloudflared
+COPY --from=builder /etc/passwd /etc/group /etc/
+USER cloudflare:cloudflare
+ENTRYPOINT ["/usr/local/bin/cloudflared"]

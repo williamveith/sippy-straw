@@ -4,7 +4,13 @@
         "armv",
         "binutils",
         "buildx",
+        "Cerbot",
+        "certbot",
+        "certonly",
         "cloudflared",
+        "custombuilder",
+        "godotenv",
+        "joho",
         "tiecloud"
     ]
 }
