@@ -46,6 +46,7 @@ services:
       - .env
     networks:
       - piping
+      - external_app_net
     restart: always
     deploy:
       resources:
@@ -64,6 +65,7 @@ services:
     container_name: certbot
     volumes:
       - letsencrypt:/etc/letsencrypt
+      - letsencrypt_lib:/var/lib/letsencrypt
     secrets:
       - source: cloudflare-ini
         target: /etc/cloudflare/cloudflare.ini
@@ -79,23 +81,6 @@ services:
           cpus: "0.25"
           memory: 6M
 
-  app_server:
-    image: nginxdemos/hello:0.4@sha256:a97d837baef1734cfaa19c24f333bfdf402b78de634b63b7f51c422d0270300e
-    container_name: app_server
-    networks:
-      - piping
-    expose:
-      - "8000"
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
-        reservations:
-          cpus: "0.1"
-          memory: 256M
-
 networks:
   piping:
     driver: bridge
@@ -105,5 +90,5 @@ networks:
 volumes:
   letsencrypt:
     name: "letsencrypt"
-    labels:
-      com.williamveith.dropbox.description: "Certbot keys and certificates"
+  letsencrypt_lib:
+    name: "letsencrypt_lib"
