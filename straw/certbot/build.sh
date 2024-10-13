@@ -14,6 +14,6 @@ docker buildx build \
   --build-arg GOLANG_IMAGE_VERSION=$GOLANG_IMAGE_VERSION \
   --build-arg CERTBOT_IMAGE_VERSION=$CERTBOT_IMAGE_VERSION \
   --tag williamveith/certbot:$CERTBOT_IMAGE_VERSION \
-  --file certbot/Dockerfile \
+  --file certbot/Dockerfile.certbot \
   --push \
   .
