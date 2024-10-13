@@ -58,17 +58,16 @@ services:
           memory: 20M
 
   certbot:
-    build:
-      context: .
-      dockerfile: ./certbot/Dockerfile
-    image: williamveith/dns-cloudflare:v2.11.0
+    image: williamveith/certbot:v2.11.0@sha256:27f3acb3d590b096f5401f58cdc434099c779e904f1062915c5ea1cd70f1bac6
     container_name: certbot
+    env_file:
+      - .env
     volumes:
       - letsencrypt:/etc/letsencrypt
-      - letsencrypt_lib:/var/lib/letsencrypt
+      - letsencrypt:/var/lib/letsencrypt
     secrets:
       - source: cloudflare-ini
-        target: /etc/cloudflare/cloudflare.ini
+        target: /etc/letsencrypt/cloudflare.ini
     networks:
       - piping
     restart: always
@@ -80,7 +79,7 @@ services:
         reservations:
           cpus: "0.25"
           memory: 6M
-
+          
 networks:
   piping:
     driver: bridge
@@ -90,5 +89,5 @@ networks:
 volumes:
   letsencrypt:
     name: "letsencrypt"
-  letsencrypt_lib:
-    name: "letsencrypt_lib"
+  cloudflared:
+    name: "cloudflared"

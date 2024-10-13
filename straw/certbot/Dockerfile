@@ -1,10 +1,25 @@
-FROM certbot/dns-cloudflare:v2.11.0@sha256:43bf5ab075f5018ae4a4a1ec9021151dab0294d72898f887c38ec86d34e4f7d3
+ARG GOLANG_IMAGE_VERSION="latest"
+ARG CERTBOT_IMAGE_VERSION="latest"
+FROM golang:$GOLANG_IMAGE_VERSION AS builder
 
-# Create necessary directories
-RUN mkdir -p /etc/letsencrypt
+# Install git (if needed) and other dependencies
+RUN apk add --no-cache git
 
-# Define volumes
-VOLUME ["/etc/letsencrypt", "/var/lib/letsencrypt"]
+# Copy the Go module files and download dependencies
+COPY certbot/entrypoint.go /usr/local/bin/entrypoint.go
+COPY certbot/go.mod /usr/local/bin/go.mod
 
-# Set the entrypoint to check if the certificate exists, request a new one if not, otherwise renew
-ENTRYPOINT ["/bin/sh", "-c", "trap exit TERM; while :; do if [ ! -f /etc/letsencrypt/live/dropbox.williamveith.com/fullchain.pem ]; then echo 'Certificate not found, requesting a new one...'; certbot certonly --non-interactive --agree-tos --dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare/cloudflare.ini --dns-cloudflare-propagation-seconds 120 -d dropbox.williamveith.com --email w.il.lia.mveith+kxnfxl6l@gmail.com; else echo 'Certificate found, attempting renewal...'; certbot renew --cert-name dropbox.williamveith.com --dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare/cloudflare.ini --dns-cloudflare-propagation-seconds 120; fi; sleep 12h & wait $!; done;"]
+# Build the Go binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$(echo $TARGETPLATFORM | cut -d'/' -f2) go build -o /usr/local/bin/entrypoint /usr/local/bin/entrypoint.go
+
+# Final stage: Create the runtime image
+FROM certbot/dns-cloudflare:$CERTBOT_IMAGE_VERSION
+
+# Copy the compiled Go binary from the builder stage
+COPY --from=builder /usr/local/bin/entrypoint /usr/local/bin/entrypoint
+
+# Ensure the entrypoint is executable
+RUN chmod +x /usr/local/bin/entrypoint
+
+# Set the entrypoint to the Go binary
+ENTRYPOINT ["/usr/local/bin/entrypoint"]

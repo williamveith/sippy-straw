@@ -1,8 +1,6 @@
-package entrypoint
+package main
 
 import (
-	"fmt"
-	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -21,17 +19,6 @@ func main() {
 	emailAddress := os.Getenv("EMAIL_ADDRESS")
 	if emailAddress == "" {
 		log.Fatal("EMAIL_ADDRESS is not set")
-	}
-
-	cloudflareIniSource := os.Getenv("CLOUDFLARE_INI_SOURCE")
-	if cloudflareIniSource == "" {
-		cloudflareIniSource = "/cloudflared/cloudflare.ini"
-	}
-
-	// Copy cloudflare.ini from source to /cloudflared/cloudflare.ini
-	err := copyFile(cloudflareIniSource, "/cloudflared/cloudflare.ini")
-	if err != nil {
-		log.Fatalf("Failed to copy cloudflare.ini: %v", err)
 	}
 
 	// Set up signal handling
@@ -57,7 +44,7 @@ func main() {
 					"--non-interactive",
 					"--agree-tos",
 					"--dns-cloudflare",
-					"--dns-cloudflare-credentials", "/cloudflared/cloudflare.ini",
+					"--dns-cloudflare-credentials", "/etc/letsencrypt/cloudflare.ini",
 					"--dns-cloudflare-propagation-seconds", "120",
 					"-d", domainName,
 					"--email", emailAddress)
@@ -72,7 +59,7 @@ func main() {
 				cmd := exec.Command("certbot", "renew",
 					"--cert-name", domainName,
 					"--dns-cloudflare",
-					"--dns-cloudflare-credentials", "/cloudflared/cloudflare.ini",
+					"--dns-cloudflare-credentials", "/etc/letsencrypt/cloudflare.ini",
 					"--dns-cloudflare-propagation-seconds", "120")
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
@@ -89,30 +76,4 @@ func main() {
 			}
 		}
 	}
-}
-
-func copyFile(src, dst string) error {
-	sourceFileStat, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	if !sourceFileStat.Mode().IsRegular() {
-		return fmt.Errorf("%s is not a regular file", src)
-	}
-
-	source, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer source.Close()
-
-	destination, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer destination.Close()
-
-	_, err = io.Copy(destination, source)
-	return err
 }
