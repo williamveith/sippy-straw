@@ -1,3 +1,13 @@
+secrets:
+  cloudflare-ini:
+    file: cloudflared/cloudflare.ini
+  origin-cert:
+    file: cloudflared/cert.pem
+  tunnel-config:
+    file: cloudflared/config.yml
+  tunnel-secret:
+    file: cloudflared/60f2a096-47a8-405a-af97-f5088a41231d.json
+  
 services:
   nginx:
     image: nginx:mainline-alpine3.20-slim@sha256:e9293c9bedb0db866e7d2b69e58131db4c2478e6cd216cdd99b134830703983a
@@ -11,21 +21,26 @@ services:
     networks:
       - piping
       - external_app_net
-    restart: on-failure
+    restart: always
     deploy:
       resources:
         limits:
-          cpus: "2"          
-          memory: 800M
+          cpus: "1.5"          
+          memory: 50M
         reservations:
-          cpus: "0.25"
-          memory: 100M
+          cpus: "0.75"
+          memory: 25M
 
   cloudflared:
-    image: williamveith/cloudflared:2024.10.0@sha256:a6f8146d7bb9f65342856a76e32569ac518f86e321fb0ee5f94705c78be38b98
+    image: williamveith/cloudflared:2024.10.0@sha256:c5551612b3678aff4dee36bb8de6c62547660e4a5507963593d9fecc089eb5fd
     container_name: cloudflared
-    volumes:
-      - ./cloudflared:/etc/cloudflared
+    secrets:
+      - source: origin-cert
+        target: /etc/cloudflared/cert.pem
+      - source: tunnel-config
+        target: /etc/cloudflared/config.yml
+      - source: tunnel-secret
+        target: /etc/cloudflared/60f2a096-47a8-405a-af97-f5088a41231d.json
     command: tunnel --no-autoupdate run dropbox
     env_file:
       - .env
@@ -35,29 +50,34 @@ services:
     deploy:
       resources:
         limits:
-          memory: 800M
+          cpus: "2.0"
+          memory: 40M
         reservations:
-          cpus: "0.25"
-          memory: 15M
+          cpus: "0.75"
+          memory: 20M
 
   certbot:
     build:
       context: .
       dockerfile: ./certbot/Dockerfile
+    image: williamveith/dns-cloudflare:v2.11.0
     container_name: certbot
     volumes:
       - letsencrypt:/etc/letsencrypt
-      - letsencrypt_lib:/var/lib/letsencrypt
-      - cloudflared:/cloudflared
+    secrets:
+      - source: cloudflare-ini
+        target: /etc/cloudflare/cloudflare.ini
     networks:
       - piping
     restart: always
     deploy:
       resources:
         limits:
-          memory: 20M
+          cpus: "1.0"
+          memory: 25M
         reservations:
-          memory: 10M
+          cpus: "0.25"
+          memory: 6M
 
   app_server:
     image: nginxdemos/hello:0.4@sha256:a97d837baef1734cfaa19c24f333bfdf402b78de634b63b7f51c422d0270300e
@@ -66,7 +86,7 @@ services:
       - piping
     expose:
       - "8000"
-    restart: on-failure
+    restart: always
     deploy:
       resources:
         limits:
@@ -84,5 +104,6 @@ networks:
 
 volumes:
   letsencrypt:
-  letsencrypt_lib:
-  cloudflared:
+    name: "letsencrypt"
+    labels:
+      com.williamveith.dropbox.description: "Certbot keys and certificates"
