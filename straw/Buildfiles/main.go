@@ -91,17 +91,13 @@ func signImage(IMAGE_TAG string) {
 		KEY_PATH = "Buildfiles"
 	}
 
-	// Set COSIGN_PASSWORD to an empty string to bypass the password prompt
 	os.Setenv("COSIGN_PASSWORD", "")
-	// Enable experimental features for Tlog signing
 	os.Setenv("COSIGN_EXPERIMENTAL", "1")
 
-	// Create command to sign the image
 	cmd := exec.Command("cosign", "sign",
 		"--key", fmt.Sprintf("%s/cosign.key", KEY_PATH),
 		IMAGE_TAG)
 
-	// Simulate typing 'y' for Tlog upload confirmation
 	cmd.Stdin = strings.NewReader("y\n")
 
 	output, err := cmd.CombinedOutput()
@@ -128,7 +124,20 @@ func verifyImage(IMAGE_TAG string) {
 		return
 	}
 
-	fmt.Println("Build completed successfully!")
+	fmt.Println("Image was verified successfully!")
+	fmt.Println(string(output))
+}
+
+func dockerCompose() {
+	cmd := exec.Command("docker-compose", "up", "--build", "-d")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Could not run docker-compose", err)
+		fmt.Println(string(output))
+		return
+	}
+
+	fmt.Println("docker-compose build and running")
 	fmt.Println(string(output))
 }
 
@@ -165,6 +174,8 @@ func main() {
 			return
 		}
 		signImage(os.Args[2])
+	case "docker-compose":
+		dockerCompose()
 	default:
 		fmt.Println("Unknown command:", os.Args[1])
 	}

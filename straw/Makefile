@@ -14,19 +14,19 @@ MAIN_PATH=${BUILDER_ROOT_DIR}/${BIN_PATH}
 GO_MOD_DIR=$(SRC_DIR)
 
 # Build for host system
-build:
+executable:
 	cd $(GO_MOD_DIR) && go build -o $(BIN_PATH) $(BUILD_FILE_NAME)
 
 # Cross-compile for Windows
-build-windows:
+executable-windows:
 	cd $(GO_MOD_DIR) && GOOS=windows GOARCH=amd64 go build -o $(BIN_PATH).exe $(BUILD_FILE_NAME)
 
 # Cross-compile for macOS
-build-mac:
+executable-mac:
 	cd $(GO_MOD_DIR) && GOOS=darwin GOARCH=amd64 go build -o $(BIN_PATH) $(BUILD_FILE_NAME)
 
 # Cross-compile for Linux
-build-linux:
+executable-linux:
 	cd $(GO_MOD_DIR) && GOOS=linux GOARCH=amd64 go build -o $(BIN_PATH) $(BUILD_FILE_NAME)
 
 builder:
@@ -43,6 +43,9 @@ sign:
 
 verify:
 	${MAIN_PATH} verify-image $(IMAGE_TAG)
+
+run:
+	${MAIN_PATH} docker-compose
 
 # Clean up build artifacts
 clean:
