@@ -1,8 +1,10 @@
 ssl/*
 cloudflared/*
-!cloudflared/manifest.md
 .DS_Store
 venv
 **/*.key
 **/*.pub
+**/*.ini
+**/*.pem
+**/cloudflared/config.yml
 .image-builder/bin/*
