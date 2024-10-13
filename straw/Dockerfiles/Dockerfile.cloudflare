@@ -1,6 +1,6 @@
 # Define the Alpine version with a specific digest
-ARG ALPINE_VERSION="latest"
-FROM --platform=$BUILDPLATFORM alpine:$ALPINE_VERSION AS builder
+ARG CLOUDFLARED_ALPINE_VERSION="latest"
+FROM --platform=$BUILDPLATFORM alpine:$CLOUDFLARED_ALPINE_VERSION AS builder
 
 # Use Docker's BUILDARCH variable to set the architecture
 ARG BUILDARCH
