@@ -128,19 +128,6 @@ func verifyImage(IMAGE_TAG string) {
 	fmt.Println(string(output))
 }
 
-func dockerCompose() {
-	cmd := exec.Command("docker-compose", "up", "--build", "-d")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Println("Could not run docker-compose", err)
-		fmt.Println(string(output))
-		return
-	}
-
-	fmt.Println("docker-compose build and running")
-	fmt.Println(string(output))
-}
-
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Please provide a command: create-builder, build-cloudflared, or build-certbot")
@@ -174,9 +161,5 @@ func main() {
 			return
 		}
 		signImage(os.Args[2])
-	case "docker-compose":
-		dockerCompose()
-	default:
-		fmt.Println("Unknown command:", os.Args[1])
 	}
 }
