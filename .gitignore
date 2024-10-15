@@ -9,3 +9,4 @@ venv
 **/*60f2a096-47a8-405a-af97-f5088a41231d.json
 **/cloudflared/config.yml
 .image-builder/bin/*
+**/bin/

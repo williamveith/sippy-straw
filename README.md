@@ -13,35 +13,26 @@ docker-compose up --build -d
 ## Project File List
 
 ```txt
-pipe
-├── .env
-├── .gitignore
-├── .image-builder
-│   ├── .env
-│   ├── Makefile
-│   ├── README.md
-│   ├── bin
-│   │   └── main
-│   ├── cosign.key
-│   ├── cosign.pub
-│   ├── go.mod
-│   ├── go.sum
-│   ├── main.go
-│   └── src
-│       └── Dockerfile.cloudflare
-├── .vscode
-│   ├── launch.json
-│   └── settings.json
+sippystraw
 ├── README.md
-├── certbot
-│   └── Dockerfile
-├── cloudflared
-│   ├── 60f2a096-47a8-405a-af97-f5088a41231d.json
-│   ├── cert.pem
-│   ├── cloudflare.ini
-│   ├── config.yml
-│   └── manifest.md
-├── docker-compose.yml
-└── nginx
-    └── app.conf
+├── appserver
+│   └── docker-compose.yml
+└── straw
+    ├── Buildfiles
+    │   ├── bin
+    │   │   └── main
+    │   ├── go.mod
+    │   ├── go.sum
+    │   └── main.go
+    ├── Dockerfiles
+    │   ├── Dockerfile.certbot
+    │   └── Dockerfile.cloudflare
+    ├── Makefile
+    ├── certbot
+    │   ├── entrypoint.go
+    │   └── go.mod
+    ├── cloudflared
+    ├── docker-compose.yml
+    └── nginx
+        └── app.conf
 ```

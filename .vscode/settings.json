@@ -3,14 +3,17 @@
         "aarch",
         "armv",
         "binutils",
+        "Buildfiles",
         "buildx",
         "Cerbot",
         "certbot",
         "certonly",
         "cloudflared",
         "custombuilder",
+        "Dockerfiles",
         "godotenv",
         "joho",
+        "sippystraw",
         "tiecloud"
     ]
 }

@@ -1,17 +1,26 @@
 # Define the source file and directory
-BUILD_FILE_NAME=main.go
+MODULE_STRAW=straw
+MODULE_APP=appserver
+
 SRC_DIR=Buildfiles
-BUILD_PATH=$(SRC_DIR)/$(BUILD_FILE_NAME)
+BUILD_FILE_NAME=main.go
+BUILD_PATH=${MODULE_STRAW}/$(SRC_DIR)/$(BUILD_FILE_NAME)
 
 # Define output binary name and output directory
 BINARY_NAME=main
 BIN_DIR=bin
 BUILDER_ROOT_DIR=Buildfiles
 BIN_PATH=$(BIN_DIR)/$(BINARY_NAME)
-MAIN_PATH=${BUILDER_ROOT_DIR}/${BIN_PATH}
+MAIN_PATH=$(BUILDER_ROOT_DIR)/$(BIN_PATH)
 
 # Set the working directory to Buildfiles where go.mod is located
-GO_MOD_DIR=$(SRC_DIR)
+GO_MOD_DIR=$(MODULE_STRAW)/$(SRC_DIR)
+
+# Load straw/.env
+ifneq (,$(wildcard $(MODULE_STRAW)/.env))
+    include $(MODULE_STRAW)/.env
+    export
+endif
 
 # Build for host system
 compile:
@@ -44,13 +53,17 @@ sign:
 verify:
 	${MAIN_PATH} verify-image $(IMAGE_TAG)
 
-run:
-	docker-compose up --build -d
-	cd ../appserver && docker-compose up --build -d
+start:
+	docker-compose -f $(MODULE_APP)/docker-compose.yml up --build -d
+	docker-compose -f $(MODULE_STRAW)/docker-compose.yml up --build -d
+	make open
 
 stop:
-	docker-compose down
-	cd ../appserver && docker-compose down
+	docker-compose -f $(MODULE_APP)/docker-compose.yml down
+	docker-compose -f $(MODULE_STRAW)/docker-compose.yml down
 
 clean:
 	cd $(GO_MOD_DIR) && rm -f $(BIN_PATH) $(BIN_PATH).exe
+
+open:
+	open "https://$(HOST_NAME)"
