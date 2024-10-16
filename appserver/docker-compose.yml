@@ -1,11 +1,10 @@
-# The alias `app_server_alias` must remain as it is used in the NGINX configuration (nginx/app.conf).
-# NGINX proxies traffic to this alias, decoupling the service name from the configuration.
 services:
-  app_server:
-    image: nginxdemos/hello:0.4@sha256:a97d837baef1734cfaa19c24f333bfdf402b78de634b63b7f51c422d0270300e
-    container_name: app_server
-    expose:
-      - "8000"
+
+  file_uploader:
+    build: ./uploader  # Directory containing Dockerfile and app.py
+    container_name: file_uploader
+    volumes:
+      - data:/data  # This mounts the /data directory for file storage
     networks:
       external_app_net:
         aliases:
@@ -14,13 +13,41 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1"
-          memory: 500M
+          cpus: "1.0"
+          memory: 50M
         reservations:
-          cpus: "0.1"
+          cpus: "0.5"
+          memory: 25M
+
+  rclone_uploader:
+    build: ./  # Assuming the Dockerfile is in the current directory
+    container_name: rclone_uploader
+    volumes:
+      - data:/data  # No host mount, encapsulates files in container only
+      - ./rclone-config:/config/rclone
+    networks:
+      external_app_net:
+        aliases:
+          - app_server_alias
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 50M
+        reservations:
+          cpus: "0.5"
           memory: 25M
 
 networks:
   external_app_net:
     name: external_app_net
     external: true
+
+volumes:
+  data:
+    name: "data"
+    driver_opts:
+      type: "tmpfs"
+      o: "size=1000m"
+      device: "tmpfs"

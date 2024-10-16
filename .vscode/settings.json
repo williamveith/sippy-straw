@@ -11,6 +11,7 @@
         "cloudflared",
         "custombuilder",
         "Dockerfiles",
+        "fastapi",
         "godotenv",
         "joho",
         "sippystraw",

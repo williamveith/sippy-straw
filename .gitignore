@@ -9,3 +9,5 @@ venv
 **/tunnel-credential.json
 **/cloudflared/config.yml
 **/bin/*
+**/rclone.conf
+**/*.log

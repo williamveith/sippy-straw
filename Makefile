@@ -40,14 +40,20 @@ compile-linux:
 builder:
 	$(BIN_PATH) create-builder
 
+builder-clean:
+	$(BIN_PATH) clean-builder
+
 nginx:
 	$(BIN_PATH) build-nginx
+	make builder-clean
 	
 cloudflared:
 	$(BIN_PATH) build-cloudflared
+	make builder-clean
 
 certbot:
 	$(BIN_PATH) build-certbot
+	make builder-clean
 
 # Image signing and verification
 sign:
@@ -77,6 +83,7 @@ open:
 all:
 	make compile
 	make builder
-	make nginx
-	make cloudflared
-	make certbot
+	$(BIN_PATH) build-nginx
+	$(BIN_PATH) build-cloudflared
+	$(BIN_PATH) build-certbot
+	make builder-clean

@@ -18,7 +18,7 @@ func createCustomBuilder() {
 	exists := checkBuilderExists(builderName)
 
 	if exists {
-		removeBuilder(builderName)
+		cleanupBuilder(builderName)
 	}
 
 	cmd := exec.Command("docker", "buildx", "create",
@@ -46,7 +46,7 @@ func checkBuilderExists(builderName string) bool {
 	return true
 }
 
-func removeBuilder(builderName string) {
+func cleanupBuilder(builderName string) {
 	fmt.Printf("Removing existing builder: %s\n", builderName)
 	cmd := exec.Command("docker", "buildx", "rm", builderName)
 	output, err := cmd.CombinedOutput()
@@ -60,6 +60,26 @@ func removeBuilder(builderName string) {
 	} else {
 		fmt.Println("Builder removed successfully!")
 	}
+
+	fmt.Println("Cleaning up volumes...")
+	cmd = exec.Command("docker", "volume", "prune", "-f")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Failed to prune volumes:", err)
+		fmt.Println(string(output))
+		return
+	}
+	fmt.Println("Volumes pruned successfully!")
+
+	fmt.Println("Cleaning up unused images...")
+	cmd = exec.Command("docker", "image", "prune", "-f")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Failed to prune images:", err)
+		fmt.Println(string(output))
+		return
+	}
+	fmt.Println("Unused images pruned successfully!")
 }
 
 func buildNginxImage() {
@@ -252,6 +272,9 @@ func main() {
 	case "create-builder":
 		fmt.Println("Creating builder...")
 		createCustomBuilder()
+	case "clean-builder":
+		builderName := os.Getenv("BUILDER_NAME")
+		cleanupBuilder(builderName)
 	case "build-nginx":
 		fmt.Println("Building nginx...")
 		buildNginxImage()

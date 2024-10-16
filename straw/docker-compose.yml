@@ -15,9 +15,6 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - letsencrypt:/etc/letsencrypt
-    ports:
-      - "8001:80"
-      - "443:443"
     networks:
       - piping
       - external_app_net
