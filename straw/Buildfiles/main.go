@@ -64,10 +64,12 @@ func removeBuilder(builderName string) {
 
 func buildNginxImage() {
 	imageTag := "williamveith/nginx:mainline-alpine3.20-slim"
+	LATEST_TAG := fmt.Sprintf("williamveith/nginx:%s", "latest")
 
 	cmd := exec.Command(
 		"docker", "buildx", "imagetools", "create",
 		"--tag", imageTag,
+		"--tag", LATEST_TAG,
 		"nginx:mainline-alpine3.20-slim",
 	)
 
@@ -89,6 +91,7 @@ func buildCloudflareImage() {
 	alpineVersion := os.Getenv("CLOUDFLARED_ALPINE_VERSION")
 	cloudflaredVersion := os.Getenv("CLOUDFLARED_VERSION")
 	IMAGE_TAG := fmt.Sprintf("williamveith/cloudflared:%s", cloudflaredVersion)
+	LATEST_TAG := fmt.Sprintf("williamveith/cloudflared:%s", "latest")
 
 	projectRoot := findProjectRoot()
 
@@ -99,6 +102,7 @@ func buildCloudflareImage() {
 	cmd := exec.Command("docker", "buildx", "build",
 		"--platform", "linux/arm64,linux/amd64,linux/386,linux/arm/v7,linux/arm/v6",
 		"--tag", IMAGE_TAG,
+		"--tag", LATEST_TAG,
 		"--builder", builderName,
 		"--push",
 		"--file", dockerfilePath,
@@ -122,6 +126,7 @@ func buildCertbotImage() {
 	certbotGolangVersion := os.Getenv("CERTBOT_GOLANG_VERSION")
 	certbotImageVersion := os.Getenv("CERTBOT_IMAGE_VERSION")
 	IMAGE_TAG := fmt.Sprintf("williamveith/certbot:%s", certbotImageVersion)
+	LATEST_TAG := fmt.Sprintf("williamveith/certbot:%s", "latest")
 
 	projectRoot := findProjectRoot()
 
@@ -133,6 +138,7 @@ func buildCertbotImage() {
 		"--build-arg", fmt.Sprintf("CERTBOT_GOLANG_VERSION=%s", certbotGolangVersion),
 		"--build-arg", fmt.Sprintf("CERTBOT_IMAGE_VERSION=%s", certbotImageVersion),
 		"--tag", IMAGE_TAG,
+		"--tag", LATEST_TAG,
 		"--file", dockerfilePath,
 		"--push",
 		buildContext)

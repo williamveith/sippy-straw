@@ -18,18 +18,22 @@ endif
 
 # Build for host system
 compile:
+	make clean
 	GOFLAGS="-mod=mod" go build -o $(BIN_PATH) $(BUILD_PATH)
 
 # Cross-compile for Windows
 compile-windows:
+	make clean
 	GOOS=windows GOARCH=amd64 GOFLAGS="-mod=mod" go build -o $(BIN_PATH).exe $(BUILD_PATH)
 
 # Cross-compile for macOS
 compile-mac:
+	make clean
 	GOOS=darwin GOARCH=amd64 GOFLAGS="-mod=mod" go build -o $(BIN_PATH) $(BUILD_PATH)
 
 # Cross-compile for Linux
 compile-linux:
+	make clean
 	GOOS=linux GOARCH=amd64 GOFLAGS="-mod=mod" go build -o $(BIN_PATH) $(BUILD_PATH)
 
 # Builder and service targets
@@ -69,3 +73,10 @@ clean:
 # Open the site
 open:
 	open "https://$(DOMAIN_NAME)"
+
+all:
+	make compile
+	make builder
+	make nginx
+	make cloudflared
+	make certbot

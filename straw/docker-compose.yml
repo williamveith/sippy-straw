@@ -6,11 +6,11 @@ secrets:
   tunnel-config:
     file: cloudflared/config.yml
   tunnel-secret:
-    file: cloudflared/60f2a096-47a8-405a-af97-f5088a41231d.json
+    file: cloudflared/tunnel-credential.json
   
 services:
   nginx:
-    image: williamveith/nginx:mainline-alpine3.20-slim@sha256:e9293c9bedb0db866e7d2b69e58131db4c2478e6cd216cdd99b134830703983a
+    image: williamveith/nginx:latest
     container_name: nginx
     volumes:
       - ./nginx:/etc/nginx/conf.d
@@ -32,7 +32,7 @@ services:
           memory: 25M
 
   cloudflared:
-    image: williamveith/cloudflared:2024.10.0@sha256:c5551612b3678aff4dee36bb8de6c62547660e4a5507963593d9fecc089eb5fd
+    image: williamveith/cloudflared:latest
     container_name: cloudflared
     secrets:
       - source: origin-cert
@@ -40,7 +40,7 @@ services:
       - source: tunnel-config
         target: /etc/cloudflared/config.yml
       - source: tunnel-secret
-        target: /etc/cloudflared/60f2a096-47a8-405a-af97-f5088a41231d.json
+        target: /etc/cloudflared/tunnel-credential.json
     command: tunnel --no-autoupdate run dropbox
     env_file:
       - .env
@@ -58,7 +58,7 @@ services:
           memory: 20M
 
   certbot:
-    image: williamveith/certbot:v2.11.0@sha256:27f3acb3d590b096f5401f58cdc434099c779e904f1062915c5ea1cd70f1bac6
+    image: williamveith/certbot:latest
     container_name: certbot
     env_file:
       - .env
