@@ -22,4 +22,5 @@ services:
 
 networks:
   external_app_net:
+    name: external_app_net
     external: true
