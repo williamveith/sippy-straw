@@ -68,4 +68,4 @@ clean:
 
 # Open the site
 open:
-	open "https://$(HOST_NAME)"
+	open "https://$(DOMAIN_NAME)"

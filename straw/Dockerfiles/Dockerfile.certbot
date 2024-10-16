@@ -6,8 +6,8 @@ FROM golang:$CERTBOT_GOLANG_VERSION AS builder
 RUN apk add --no-cache git
 
 # Copy the Go module files and download dependencies
-COPY certbot/entrypoint.go /usr/local/bin/entrypoint.go
-COPY certbot/go.mod /usr/local/bin/go.mod
+COPY entrypoint.go /usr/local/bin/entrypoint.go
+COPY go.mod /usr/local/bin/go.mod
 
 # Build the Go binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$(echo $TARGETPLATFORM | cut -d'/' -f2) go build -o /usr/local/bin/entrypoint /usr/local/bin/entrypoint.go

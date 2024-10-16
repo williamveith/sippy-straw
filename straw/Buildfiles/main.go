@@ -160,6 +160,7 @@ func signImage(IMAGE_TAG string) {
 
 	cmd := exec.Command("cosign", "sign",
 		"--key", fmt.Sprintf("%s/cosign.key", keyPath),
+		"--yes",
 		IMAGE_TAG)
 
 	cmd.Stdin = strings.NewReader("y\n")
@@ -171,8 +172,8 @@ func signImage(IMAGE_TAG string) {
 		return
 	}
 
-	fmt.Println("Image Signed Successfully!")
 	fmt.Println(string(output))
+	fmt.Println("Image Signed Successfully!")
 }
 
 func verifyImage(IMAGE_TAG string) {
